@@ -1,3 +1,8 @@
+let platforms;
+let player;
+let cursors;
+let scoreText;
+
 class Kitchen extends Phaser.Scene {
 
     preload() {

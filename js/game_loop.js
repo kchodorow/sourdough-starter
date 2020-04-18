@@ -1,8 +1,3 @@
-var platforms;
-var player;
-var cursors;
-var scoreText;
-
 const config = {
     type: Phaser.AUTO,
     width: 800,
