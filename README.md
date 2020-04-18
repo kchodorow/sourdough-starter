@@ -8,8 +8,7 @@
 
 Intro:
 
-* Add instruction
-* Create flour & water mixer
+* Add tweens
 * Add tippy thing
 
 End game:
@@ -27,4 +26,6 @@ The End? from The Blob
 * Dough flying
 * Flour
 * Water
-* Jar (intro)
+* Jar empty
+* Jar with flour
+* Jar with flour and water
