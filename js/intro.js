@@ -1,3 +1,7 @@
+const BUFFER = 5;
+const TIP_SPEED = .8;
+const TIP_ANGLE = 45;
+
 class Intro extends Phaser.Scene {
     constructor() {
         super({key: 'intro'});
@@ -23,6 +27,10 @@ class Intro extends Phaser.Scene {
 class Step1 extends Phaser.Scene {
     constructor() {
         super({key: 'step1'});
+        this._jar = null;
+        this._maxLeft = 0;
+        this._maxRight = 0;
+        this._done = false;
     }
 
     preload() {
@@ -37,6 +45,10 @@ class Step1 extends Phaser.Scene {
     }
 
     create() {
+        // User input.
+        this._cursors = this.input.keyboard.createCursorKeys();
+
+        // Instructions.
         const titleStyle = {
             fontSize: '35px', 
             fill: '#fff', 
@@ -47,27 +59,79 @@ class Step1 extends Phaser.Scene {
         title.setOrigin(.5, 0);
         title.setAlign('center');
 
-        const flour = this.add.sprite(200, 300, 'flour');
-        flour.setInteractive();
-        const water = this.add.sprite(600, 300, 'water');
-        water.setInteractive();
+        // TODO: put these in a group and just get group members.
+        this._flour = this.add.sprite(200, 300, 'flour');
+        this._flour.setInteractive();
+        this._water = this.add.sprite(600, 300, 'water');
+        this._water.setInteractive();
 
-        flour.on('pointerdown', function(pointer) {
-            flour.destroy();
-            if (!water.active) {
-                step2(title);
+        const originalThis = this;
+        this._flour.on('pointerdown', function(pointer) {
+            originalThis._flour.destroy();
+            if (!originalThis._water.active) {
+                originalThis.step2(title);
             }
         });
-        water.on('pointerdown', function(pointer) {
-            water.destroy();
-            if (!flour.active) {
-                step2(title);
+        this._water.on('pointerdown', function(pointer) {
+            originalThis._water.destroy();
+            if (!originalThis._flour.active) {
+                originalThis.step2(title);
             }
         });
-        const jar = this.add.sprite(400, 300, 'jar');
+        this._jar = this.add.sprite(400, 300, 'jar').setScale(2.0);
+    }
+
+    update() {
+        if (!this.allIngredientsAdded() || this._done) {
+            return;
+        }
+        // TODO: add "hey quit it" message on initial rocking.
+        const tip = TIP_SPEED * (Math.abs(this._jar.angle) + 1);
+        if (this._cursors.left.isDown) {
+            if (this._jar.angle > this._maxLeft - BUFFER) {
+                this._jar.angle -= tip;
+                this._maxRight += tip;
+            }
+            if (Math.abs(this._jar.angle) > TIP_ANGLE) {
+                this._jar.angle = -90;
+                this._done = true;
+            }
+        }
+        else if (this._cursors.right.isDown) {
+            if (this._jar.angle < this._maxRight + BUFFER) {
+                this._jar.angle += tip;
+                this._maxLeft -= tip;
+            }
+            if (Math.abs(this._jar.angle) > TIP_ANGLE) {
+                this._jar.angle = 90;
+                this._done = true;
+            }
+        }
+    }
+
+    allIngredientsAdded() {
+        return !this._flour.active && !this._water.active;
+    }
+
+    step2(title) {
+        title.setText('That\'s it! Now you just have to wait.');
+    
+        this.time.addEvent({
+            delay: 1500,  // ms
+            callback: tiltSuggestion,
+            callbackScope: this,
+        });
     }
 }
 
-const step2 = function(title) {
-    title.setText('That\'s it! Now you just have to wait.');
+const tiltSuggestion = function() {
+    const hintStyle = {
+        fontSize: '28px', 
+        fill: '#f00', 
+        fontFamily: '"Dancing Script"',
+    };
+    hint = this.add.text(
+        400, 550, '(Use left and right to tilt the jar)', hintStyle);
+    hint.setOrigin(.5, 0);
+    hint.setAlign('center');
 }
