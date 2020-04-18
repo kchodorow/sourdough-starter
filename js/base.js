@@ -1,12 +1,16 @@
 class BaseStep extends Phaser.Scene {
 
-    addInstructions(text) {
-        const titleStyle = {
+    constructor(keyDict) {
+        super(keyDict);
+        this._textStyle = {
             fontSize: '35px', 
             fill: '#fff',
             fontFamily: '"Dancing Script"',
-        };
-        const title = this.add.text(400, 50, text, titleStyle);
+        }
+    }
+
+    addInstructions(text) {
+        const title = this.add.text(400, 50, text, this._textStyle);
         title.setOrigin(.5, 0);
         title.setAlign('center');
         return title;

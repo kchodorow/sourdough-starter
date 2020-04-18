@@ -17,11 +17,14 @@ class Step2 extends BaseStep {
 
     create(data) {
         this.addInstructions('Step 2: put in a warm area (70°-85° F).');
+        this._temperature = this.add.text(780, 580, '68°', this._textStyle);
+        this._temperature.setOrigin(1, 1).setAlign('right').setFontSize(22);
 
         player = this.add.sprite(data.x, data.y, 'dude');
         player.properties = {
             weight: 20.0,
             fermented: 5.0,
+            temperature: 68,
             velocityX: 0,
             velocityY: 0,
         };
@@ -50,26 +53,31 @@ class Step2 extends BaseStep {
         cursors = this.input.keyboard.createCursorKeys();
         
         // Add warm spot.
-        const hot_spot_x = Math.floor(Math.random() * game.config.width / 50);
-        const hot_spot_y = Math.floor(Math.random() * game.config.height / 50);
-        var graphics = this.add.graphics();
-        graphics.fillStyle(0xff0000, .5);
-        graphics.fillRect(hot_spot_x * 50, hot_spot_y * 50, 50, 50);
+        const hot_spot_x = 4; //Math.floor(Math.random() * game.config.width / 50);
+        const hot_spot_y = 8; //Math.floor(Math.random() * game.config.height / 50);
+        const hotspot = this.add.graphics();
+        hotspot.fillStyle(0xff0000, .5);
+        hotspot.fillRect(hot_spot_x * 50, hot_spot_y * 50, 50, 50);
         for (let i = hot_spot_x - 2; i <= hot_spot_x + 2; ++i) {
             for (let j = hot_spot_y - 2; j <= hot_spot_y + 2; ++j) {
                 const centralness = 2 - Math.max(
                     Math.abs(i - hot_spot_x), Math.abs(j - hot_spot_y));
-                graphics.fillStyle(0xff0000, .4 + .1 * centralness);
-                graphics.fillRect(i * 50, j * 50, 50, 50);
+                hotspot.fillStyle(0xff0000, .4 + .1 * centralness);
+                hotspot.fillRect(i * 50, j * 50, 50, 50);
             }
         }
         let tween = this.tweens.add({
-            targets: graphics,
+            targets: hotspot,
             duration: 3000,
             alpha: {start: .5, to: 1},
             repeat: -1,
             yoyo: true,
         });
+        this.physics.arcade.collide(player, hotspot, this.incrementTemp, null, this);
+    }
+
+    incrementTemp() {
+        this.temp += 1;
     }
 
     update() {
