@@ -8,7 +8,7 @@ const config = {
             gravity: { y: 300 }
         }
     },
-    scene: [Intro, Step1, Kitchen],
+    scene: [Intro, Step1, Step2, Kitchen],
 };
 
 const game = new Phaser.Game(config);

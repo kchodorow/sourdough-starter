@@ -3,13 +3,12 @@
 * Friction
 * Scrolling
 * Light
-* End game
 * Trimming/baking
 
 Intro:
 
 * Add tweens
-* Add tippy thing
+* Add naming scene
 
 End game:
 

@@ -20,12 +20,13 @@ class Intro extends Phaser.Scene {
         title.setAlign('center');
 
         this.input.once('pointerdown', function (event) {
-            this.scene.start('step1');
+            //this.scene.start('step1');
+            this.scene.start('step2', {x: 450, y: 300});
         }, this);
     }
 }
 
-class Step1 extends Phaser.Scene {
+class Step1 extends BaseStep {
     constructor() {
         super({key: 'step1'});
         this._jar = null;
@@ -52,15 +53,7 @@ class Step1 extends Phaser.Scene {
         this._cursors = this.input.keyboard.createCursorKeys();
 
         // Instructions.
-        const titleStyle = {
-            fontSize: '35px', 
-            fill: '#fff', 
-            fontFamily: '"Dancing Script"',
-        };
-        const title = this.add.text(
-            400, 50, 'Step 1: mix flour and water.', titleStyle);
-        title.setOrigin(.5, 0);
-        title.setAlign('center');
+        this.addInstructions('Step 1: mix flour and water.');
 
         // TODO: put these in a group and just get group members.
         this._flour = this.add.sprite(200, 300, 'flour');
@@ -94,7 +87,7 @@ class Step1 extends Phaser.Scene {
             }
             this._transitioning = true;
             this.scene.transition({
-                target: 'kitchen',
+                target: 'step2',
                 duration: 5000,
                 moveBelow: true,
                 onUpdate: this.transitionOut,
