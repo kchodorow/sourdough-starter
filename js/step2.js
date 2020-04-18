@@ -1,3 +1,4 @@
+const EPSILON = .2;
 const SPEED = 5;
 
 class Step2 extends BaseStep {
@@ -54,22 +55,38 @@ class Step2 extends BaseStep {
         if (cursors.left.isDown) {
             player.properties.velocityX = -SPEED;
             player.anims.play('left', true);
-        }
-        else if (cursors.right.isDown) {
+        } else if (cursors.right.isDown) {
             player.properties.velocityX = SPEED;
             player.anims.play('right', true);
-        }
-        else {
+        } else if (cursors.up.isDown) {
+            player.properties.velocityY = -SPEED;
+            player.anims.play('right', true);
+        } else if (cursors.down.isDown) {
+            player.properties.velocityY = SPEED;
+            player.anims.play('left', true);
+        } else {
             if (player.properties.velocityX > 0) {
-                player.properties.velocityX--;
+                player.properties.velocityX -= .1;
             } else if (player.properties.velocityX < 0) {
-                player.properties.velocityX++;
+                player.properties.velocityX += .1;
             }
-            else {
+            if (player.properties.velocityY > 0) {
+                player.properties.velocityY -= .1;
+            } else if (player.properties.velocityY < 0) {
+                player.properties.velocityY += .1;
+            }
+            if (Math.abs(player.properties.velocityX) < EPSILON) {
+                player.properties.velocityX = 0;
+            }
+            if (Math.abs(player.properties.velocityY) < EPSILON) {
+                player.properties.velocityY = 0;
+            }
+            if (player.properties.velocityX == 0 & player.properties.velocityY == 0) {
                 player.anims.play('turn');
             }
         }
 
         player.x += player.properties.velocityX;
+        player.y += player.properties.velocityY;
     }
 }
