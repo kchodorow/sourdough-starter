@@ -9,7 +9,7 @@ class Step2 extends BaseStep {
     preload() {
         this.load.setBaseURL('http://labs.phaser.io');
 
-        this.load.image('flour', 'assets/sprites/tomato.png');
+        this.load.image('hotspot', 'assets/sprites/tomato.png');
         this.load.spritesheet('dude', 
             'assets/sprites/dude.png',
             { frameWidth: 32, frameHeight: 48 });
@@ -17,10 +17,14 @@ class Step2 extends BaseStep {
 
     create(data) {
         this.addInstructions('Step 2: put in a warm area (70°-85° F).');
-        this._temperature = this.add.text(780, 580, '68°', this._textStyle);
-        this._temperature.setOrigin(1, 1).setAlign('right').setFontSize(22);
 
-        player = this.add.sprite(data.x, data.y, 'dude');
+        // Add thermometer.
+        this._thermometer = this.add.text(780, 580, '68°', this._textStyle);
+        this._thermometer.setOrigin(1, 1).setAlign('right').setFontSize(22);
+
+        player = this.physics.add.sprite(data.x, data.y, 'dude');
+        player.setBounce(0.2);
+        player.setCollideWorldBounds(true);
         player.properties = {
             weight: 20.0,
             fermented: 5.0,
@@ -55,67 +59,62 @@ class Step2 extends BaseStep {
         // Add warm spot.
         const hot_spot_x = 4; //Math.floor(Math.random() * game.config.width / 50);
         const hot_spot_y = 8; //Math.floor(Math.random() * game.config.height / 50);
-        const hotspot = this.add.graphics();
-        hotspot.fillStyle(0xff0000, .5);
-        hotspot.fillRect(hot_spot_x * 50, hot_spot_y * 50, 50, 50);
-        for (let i = hot_spot_x - 2; i <= hot_spot_x + 2; ++i) {
-            for (let j = hot_spot_y - 2; j <= hot_spot_y + 2; ++j) {
-                const centralness = 2 - Math.max(
-                    Math.abs(i - hot_spot_x), Math.abs(j - hot_spot_y));
-                hotspot.fillStyle(0xff0000, .4 + .1 * centralness);
-                hotspot.fillRect(i * 50, j * 50, 50, 50);
-            }
-        }
+        const hotspot = this.physics.add.group({
+            key: 'hotspot',
+            repeat: 9,
+        });
+        hotspot.temperature = 140;
+        Phaser.Actions.GridAlign(hotspot.getChildren(), {
+            width: 3,
+            height: 3,
+            cellWidth: 50,
+            cellHeight: 50,
+            x: 150,
+            y: 350,
+        });
         let tween = this.tweens.add({
-            targets: hotspot,
+            targets: hotspot.getChildren(),
             duration: 3000,
             alpha: {start: .5, to: 1},
             repeat: -1,
             yoyo: true,
         });
-        this.physics.arcade.collide(player, hotspot, this.incrementTemp, null, this);
+        this.physics.add.overlap(
+            player, hotspot, this.incrementTemp, null, this);
     }
 
-    incrementTemp() {
-        this.temp += 1;
+    incrementTemp(player, hotspot) {
+        this.moveTempTowards(140);
+    }
+
+    moveTempTowards(target) {
+        if (player.properties.temperature <= target) {
+            player.properties.temperature += .1;
+        }
+        if (player.properties.temperature > target) {
+            player.properties.temperature -= .1;
+        }
+        this._thermometer.setText(
+            `${Math.floor(player.properties.temperature)}°`);
     }
 
     update() {
         if (cursors.left.isDown) {
-            player.properties.velocityX = -SPEED;
+            player.setVelocityX(-60);
             player.anims.play('left', true);
         } else if (cursors.right.isDown) {
-            player.properties.velocityX = SPEED;
+            player.setVelocityX(60);
             player.anims.play('right', true);
         } else if (cursors.up.isDown) {
-            player.properties.velocityY = -SPEED;
+            player.setVelocityY(-60);
             player.anims.play('right', true);
         } else if (cursors.down.isDown) {
-            player.properties.velocityY = SPEED;
+            player.setVelocityY(60);
             player.anims.play('left', true);
         } else {
-            if (player.properties.velocityX > 0) {
-                player.properties.velocityX -= .1;
-            } else if (player.properties.velocityX < 0) {
-                player.properties.velocityX += .1;
-            }
-            if (player.properties.velocityY > 0) {
-                player.properties.velocityY -= .1;
-            } else if (player.properties.velocityY < 0) {
-                player.properties.velocityY += .1;
-            }
-            if (Math.abs(player.properties.velocityX) < EPSILON) {
-                player.properties.velocityX = 0;
-            }
-            if (Math.abs(player.properties.velocityY) < EPSILON) {
-                player.properties.velocityY = 0;
-            }
-            if (player.properties.velocityX == 0 & player.properties.velocityY == 0) {
-                player.anims.play('turn');
-            }
+            player.anims.play('turn');
         }
 
-        player.x += player.properties.velocityX;
-        player.y += player.properties.velocityY;
+        this.moveTempTowards(68);
     }
 }
