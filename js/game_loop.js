@@ -1,7 +1,7 @@
 var platforms;
 var player;
 var cursors;
-var score = 0;
+var sourness = 0;
 var scoreText;
 
 const config = {
@@ -71,6 +71,18 @@ function create ()
         repeat: -1
     });
 
+    // Add flour.
+    const flour = this.physics.add.group({
+        key: 'flour',
+        repeat: 11,
+        setXY: { x: 12, y: 0, stepX: 70 }
+    });
+    flour.children.iterate(function (child) {
+        child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    });
+    this.physics.add.collider(flour, platforms);
+    this.physics.add.overlap(player, flour, collectFlour, null, this);
+
     // User input.
     cursors = this.input.keyboard.createCursorKeys();
 
@@ -102,7 +114,14 @@ function update() {
     }
 }
 
-function increaseSourness(player, star) {
-    score += 1;
-    scoreText.setText('Sourness: ' + score);
+function collectFlour(player, flour) {
+    sourness -= 10;
+    flour.disableBody(true, true);
+    player.weight += 10;
+    scoreText.setText('Sourness: ' + sourness);
+}
+
+function increaseSourness() {
+    sourness += 1;
+    scoreText.setText('Sourness: ' + sourness);
 }
