@@ -1,7 +1,6 @@
 var platforms;
 var player;
 var cursors;
-var sourness = 0;
 var scoreText;
 
 const config = {
@@ -50,6 +49,10 @@ function create ()
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
     this.physics.add.collider(player, platforms);
+    player.properties = {
+        weight: 20.0,
+        fermented: 5.0,
+    };
     
     this.anims.create({
         key: 'left',
@@ -87,8 +90,8 @@ function create ()
     cursors = this.input.keyboard.createCursorKeys();
 
     // Status.
-    scoreText = this.add.text(
-        16, 16, 'Sourness: 0', { fontSize: '32px', fill: '#000' });
+    scoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#000' });
+    displaySourness(player);
 }
 
 function update() {
@@ -110,18 +113,23 @@ function update() {
     }
 
     if (Math.random() < .01) {
-        increaseSourness();
+        increaseSourness(player);
     }
 }
 
 function collectFlour(player, flour) {
-    sourness -= 10;
     flour.disableBody(true, true);
-    player.weight += 10;
-    scoreText.setText('Sourness: ' + sourness);
+    player.properties.weight += 10.0;
+    displaySourness(player);
 }
 
-function increaseSourness() {
-    sourness += 1;
-    scoreText.setText('Sourness: ' + sourness);
+function increaseSourness(player) {
+    player.properties.fermented += 1.0;
+    displaySourness(player);
+}
+
+function displaySourness(player) {
+    const sourness = Math.floor(
+        100 * player.properties.fermented / player.properties.weight);
+    scoreText.setText(`Sourness: ${sourness}%`);
 }
