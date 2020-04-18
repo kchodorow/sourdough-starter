@@ -19,7 +19,7 @@ class Kitchen extends Phaser.Scene {
             { frameWidth: 32, frameHeight: 48 });
     }
 
-    create() {
+    create(data) {
         // Background.
         this.add.image(400, 300, 'sky');
         platforms = this.physics.add.staticGroup();
@@ -29,7 +29,7 @@ class Kitchen extends Phaser.Scene {
         platforms.create(750, 220, 'ground');
 
         // Player.
-        player = this.physics.add.sprite(100, 450, 'dude');
+        player = this.physics.add.sprite(data.x, data.y, 'dude');
         player.setBounce(0.2);
         player.setCollideWorldBounds(true);
         this.physics.add.collider(player, platforms);

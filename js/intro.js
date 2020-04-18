@@ -1,6 +1,7 @@
 const BUFFER = 5;
-const TIP_SPEED = .8;
+const STARTER_OFFSET = 50;
 const TIP_ANGLE = 45;
+const TIP_SPEED = .8;
 
 class Intro extends Phaser.Scene {
     constructor() {
@@ -30,7 +31,9 @@ class Step1 extends Phaser.Scene {
         this._jar = null;
         this._maxLeft = 0;
         this._maxRight = 0;
-        this._done = false;
+        this._knocked_over = false;
+        this._transitioning = false;
+        this._starter = null;
     }
 
     preload() {
@@ -82,8 +85,21 @@ class Step1 extends Phaser.Scene {
     }
 
     update() {
-        if (!this.allIngredientsAdded() || this._done) {
+        if (!this.allIngredientsAdded()) {
             return;
+        }
+        if (this._knocked_over) {
+            if (this._transitioning) {
+                return;
+            }
+            this._transitioning = true;
+            this.scene.transition({
+                target: 'kitchen',
+                duration: 5000,
+                moveBelow: true,
+                onUpdate: this.transitionOut,
+                data: {x: this._starter.x, y: this._starter.y},
+            });
         }
         // TODO: add "hey quit it" message on initial rocking.
         const tip = TIP_SPEED * (Math.abs(this._jar.angle) + 1);
@@ -94,7 +110,8 @@ class Step1 extends Phaser.Scene {
             }
             if (Math.abs(this._jar.angle) > TIP_ANGLE) {
                 this._jar.angle = -90;
-                this._done = true;
+                this._knocked_over = true;
+                this.addStarter(-1);
             }
         }
         else if (this._cursors.right.isDown) {
@@ -104,9 +121,19 @@ class Step1 extends Phaser.Scene {
             }
             if (Math.abs(this._jar.angle) > TIP_ANGLE) {
                 this._jar.angle = 90;
-                this._done = true;
+                this._knocked_over = true;
+                this.addStarter(1);
             }
         }
+    }
+
+    addStarter(dir) {
+        this._starter = this.add.sprite(
+            400 + (STARTER_OFFSET * dir), 300, 'dude');
+    }
+
+    transitionOut(progress) {
+        this._jar.setAlpha(1 - progress);
     }
 
     allIngredientsAdded() {
