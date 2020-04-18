@@ -4,6 +4,9 @@ let cursors;
 let scoreText;
 
 class Kitchen extends Phaser.Scene {
+    constructor() {
+        super({key: 'kitchen'});
+    }
 
     preload() {
         this.load.setBaseURL('http://labs.phaser.io');
