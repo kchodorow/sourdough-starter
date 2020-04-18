@@ -1,12 +1,6 @@
-const Kitchen = new Phaser.Class({
-    Extends: Phaser.Scene,
-    initialize:
+class Kitchen extends Phaser.Scene {
 
-    function Kitchen() {
-        Phaser.Scene.call(this, { key: 'kitchen' });
-    },
-
-    preload: function() {
+    preload() {
         this.load.setBaseURL('http://labs.phaser.io');
 
         this.load.image('sky', 'assets/skies/sky1.png');
@@ -15,9 +9,9 @@ const Kitchen = new Phaser.Class({
         this.load.spritesheet('dude', 
             'assets/sprites/dude.png',
             { frameWidth: 32, frameHeight: 48 });
-    },
+    }
 
-    create: function() {
+    create() {
         // Background.
         this.add.image(400, 300, 'sky');
         platforms = this.physics.add.staticGroup();
@@ -74,9 +68,9 @@ const Kitchen = new Phaser.Class({
         // Status.
         scoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#000' });
         displaySourness(player);
-    },
+    }
 
-    update: function() {
+    update() {
         if (cursors.left.isDown) {
             player.setVelocityX(-160);
             player.anims.play('left', true);
@@ -97,8 +91,8 @@ const Kitchen = new Phaser.Class({
         if (Math.random() < .01) {
             increaseSourness(player);
         }
-    },
-});
+    }
+}
 
 const collectFlour = function(player, flour) {
     flour.disableBody(true, true);
