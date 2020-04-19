@@ -2,6 +2,7 @@
 
 * Add guages for all three measures
 * Add interstitials with directions
+* Make hotspot clearer (tint?)
 
 Intro:
 

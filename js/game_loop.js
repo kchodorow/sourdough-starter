@@ -1,6 +1,9 @@
 const BACKGROUND_COLOR = 0x9ca9b5;
 const TEXT_COLOR_STR = '#203c54';
 
+let player;
+let cursors;
+
 const config = {
     type: Phaser.AUTO,
     width: 800,

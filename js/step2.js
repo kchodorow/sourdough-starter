@@ -81,6 +81,7 @@ class Step2 extends BaseStep {
         const weight = Math.floor(player.properties.weight);
         this._thermometer.setText(
             `Temperature: ${curTemp}°\nFermentation: ${abv}%\nWeight: ${weight}oz`);
+        this._thermometerGauge.setGauge(curTemp/140);
     }
 
     addPlayer(data) {
@@ -126,7 +127,15 @@ class Step2 extends BaseStep {
             align: 'right',
         };
         // Add thermometer.
-        this._thermometer = this.add.text(790, 590, '', hudTextStyle).setOrigin(1, 1);
+        this._thermometer = this.add.text(0, 120, '', hudTextStyle).setOrigin(1, 1);
+
+        this._thermometerText = this.add.text(0, 120, '68', hudTextStyle);
+        this._thermometerGauge = new Gauge(this, .5, .7);
+        this.add.existing(this._thermometerGauge);
+        this._thermometerGauge.x = 0;
+        this._thermometerGauge.y = 0;
+        const thermometer = this.add.container(
+            760, 380, [this._thermometerGauge, this._thermometerText]);
 
         this._maturityMeter = new Phaser.GameObjects.Graphics(this);
         this._maturityMeter.maturity = 0;
