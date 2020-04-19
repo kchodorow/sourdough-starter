@@ -4,7 +4,7 @@ class BaseStep extends Phaser.Scene {
         super(keyDict);
         this._textStyle = {
             fontSize: '35px', 
-            fill: '#fff',
+            fill: TEXT_COLOR_STR,
             fontFamily: '"Dancing Script"',
         }
     }

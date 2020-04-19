@@ -17,6 +17,7 @@ class Step2 extends BaseStep {
     }
 
     create(data) {
+        this.cameras.main.setBackgroundColor(BACKGROUND_COLOR);
         this._startTime = this.time.now;
         this._instructions = this.addInstructions(
             'Step 2: put in a warm area (70°-85° F).');
@@ -164,9 +165,9 @@ class Step2 extends BaseStep {
         } else if (player.properties.temperature >= 50 &&
             player.properties.temperature <= 120) {
             player.properties.fermented += .01;
-        } else {
-            player.properties.fermented -= .1;
         }
+        // At other temperatures fermentation stops.
+
         const x = player.properties.fermented / player.properties.weight;
         let y = -9.3 * x * x + 8.3 * x + 1.1;
         if (y < .5) {
@@ -179,17 +180,16 @@ class Step2 extends BaseStep {
         player.setScale(y, y);
         let gameOver = false;
         if (x < .1) {
-            player.properties['causeOfDeath'] = 'unsustainably low fermentation';
+            player.properties['causeOfDeath'] = 'had unsustainably low fermentation';
             gameOver = true;
         } else if (x > .9) {
-            player.properties['causeOfDeath'] = 'its yeast running out of food';
+            player.properties['causeOfDeath'] = 'ran out of food';
             gameOver = true;
         }
         if (gameOver) {
             const elapsedTime = Math.floor((this.time.now - this._startTime) / 1000);
             player.properties['elapsedTime'] = elapsedTime;
-            this.scene.start('gameover', player.properties);            
-
+            this.scene.start('gameover', player.properties);
         }
     }
 }

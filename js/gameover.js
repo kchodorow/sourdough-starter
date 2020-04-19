@@ -4,10 +4,11 @@ class GameOver extends BaseStep {
     }
 
     create(data) {
+        this.cameras.main.setBackgroundColor(BACKGROUND_COLOR);
         const title = this.add.text(
             400, 
             150, 
-            `Game over\nYour starter died due to ${data.causeOfDeath}.`,
+            `Game over\nYour starter ${data.causeOfDeath}.`,
             this._textStyle);
         title.setOrigin(.5, 0);
         title.setAlign('center');

@@ -9,9 +9,10 @@ class Intro extends Phaser.Scene {
     }
 
     create() {
+        this.cameras.main.setBackgroundColor(BACKGROUND_COLOR);
         const titleStyle = {
             fontSize: '40px', 
-            fill: '#fff', 
+            fill: TEXT_COLOR_STR, 
             fontFamily: '"Dancing Script"',
         };
         const title = this.add.text(
@@ -38,6 +39,7 @@ class Step1 extends BaseStep {
     }
 
     preload() {
+        this.cameras.main.setBackgroundColor(BACKGROUND_COLOR);
         this.load.image('flour', 'assets/flour.png');
         this.load.image('water', 'assets/water.png');
         this.load.image('jar', 'assets/jar.png');
@@ -146,7 +148,7 @@ class Step1 extends BaseStep {
 const tiltSuggestion = function() {
     const hintStyle = {
         fontSize: '28px', 
-        fill: '#f00', 
+        fill: '#3e3e70', 
         fontFamily: '"Dancing Script"',
     };
     hint = this.add.text(
