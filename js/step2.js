@@ -144,14 +144,19 @@ class Step2 extends BaseStep {
 
     moveTempTowards(target) {
         if (player.properties.temperature <= target) {
-            player.properties.temperature += .05;
-        }
-        if (player.properties.temperature > target) {
-            player.properties.temperature -= .05;
+            player.properties.temperature += .003;
+        } else if (player.properties.temperature > target) {
+            player.properties.temperature -= .003;
         }
         const curTemp = Math.floor(player.properties.temperature);
         if (curTemp >= 112) {
             this._instructions.setText('Yeast will start to die at 120°.');
+        }
+        if (curTemp <= 40) {
+            this.gameOver('got too cold');
+        }
+        if (curTemp >= 140) {
+            this.gameOver('got too hot');
         }
         this._thermometer.setText(`${curTemp}°`);
     }
@@ -184,12 +189,14 @@ class Step2 extends BaseStep {
     updateFermetation() {
         if (player.properties.temperature >= 70 &&
             player.properties.temperature <= 85) {
-            player.properties.fermented += .1;
+            player.properties.fermented += .01;
         } else if (player.properties.temperature >= 50 &&
             player.properties.temperature <= 120) {
-            player.properties.fermented += .01;
+            player.properties.fermented += .001;
+        } else {
+            // At other temperatures yeast starts to die.
+            player.properties.fermented -= .001;
         }
-        // At other temperatures fermentation stops.
 
         const x = player.properties.fermented / player.properties.weight;
         let y = -9.3 * x * x + 8.3 * x + 1.1;
@@ -201,18 +208,18 @@ class Step2 extends BaseStep {
         this._debug.setText(
             `${Math.floor(player.properties.fermented)}/${Math.floor(player.properties.weight)}`);
         player.setScale(y, y);
-        let gameOver = false;
+
         if (x < .1) {
-            player.properties['causeOfDeath'] = 'had unsustainably low fermentation';
-            gameOver = true;
+            this.gameOver('had unsustainably low fermentation');
         } else if (x > .9) {
-            player.properties['causeOfDeath'] = 'ran out of food';
-            gameOver = true;
+            this.gameOver('ran out of food');
         }
-        if (gameOver) {
-            const elapsedTime = Math.floor((this.time.now - this._startTime) / 1000);
-            player.properties['elapsedTime'] = elapsedTime;
-            this.scene.start('gameover', player.properties);
-        }
+    }
+
+    gameOver(msg) {
+        player.properties['causeOfDeath'] = msg
+        const elapsedTime = Math.floor((this.time.now - this._startTime) / 1000);
+        player.properties['elapsedTime'] = elapsedTime;
+        this.scene.start('gameover', player.properties);
     }
 }
