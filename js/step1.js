@@ -27,8 +27,7 @@ class Intro extends Phaser.Scene {
 
         this.input.once('pointerdown', function (event) {
             //this.scene.start('step1');
-            this.scene.start('gameover', {win:true, discard:10});
-//            this.scene.start('step2', {x: 450, y: 300});
+            this.scene.start('step2',  {x: 450, y: 300});
         }, this);
     }
 }
@@ -114,7 +113,7 @@ class Step1 extends BaseStep {
             this._transitioning = true;
             this.scene.transition({
                 target: 'step2',
-                duration: 5000,
+                duration: 3000,
                 moveBelow: true,
                 onUpdate: this.transitionOut,
                 data: {x: this._starter.x, y: this._starter.y},
@@ -153,6 +152,8 @@ class Step1 extends BaseStep {
 
     transitionOut(progress) {
         this._jar.setAlpha(1 - progress);
+        this._flour.setAlpha(1 - progress);
+        this._water.setAlpha(1 - progress);
     }
 
     allIngredientsAdded() {

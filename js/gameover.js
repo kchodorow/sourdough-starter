@@ -5,7 +5,10 @@ class GameOver extends BaseStep {
 
     preload() {
         this.cameras.main.setBackgroundColor(BACKGROUND_COLOR);
-        this.load.image('pancakes', 'assets/flour.png');
+        this.load.spritesheet(
+            'pancakes',
+            'assets/pancakes.png',
+            {frameWidth: 50, frameHeight: 50});
     }
 
     create(data) {
@@ -40,8 +43,9 @@ class GameOver extends BaseStep {
         }
         const pancakes = this.physics.add.group({
             key: 'pancakes',
-            repeat: numPancakes,
-            setXY: { x: 50, y: 0, stepX: 800/numPancakes }
+            repeat: numPancakes - 1,
+            setXY: { x: 50, y: 0, stepX: 800/numPancakes },
+            frames: [0, 1, 2],
         });
         pancakes.children.iterate(function (child) {
             child.setCollideWorldBounds(true)

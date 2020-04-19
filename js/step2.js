@@ -15,7 +15,7 @@ class Step2 extends BaseStep {
     preload() {
         this.load.image('hotspot', 'assets/bg.png');
         this.load.image('flour', 'assets/flour.png');
-        this.load.image('chopper', 'assets/water.png');
+        this.load.image('chopper', 'assets/chopper.png');
         this.load.spritesheet(
             'starter',
             'assets/starter.png',
@@ -27,10 +27,10 @@ class Step2 extends BaseStep {
         this._startTime = this.time.now;
 
         this._instructions = this.addInstructions(
-            'Step 2: put in a warm area (70°-85° F).');
+            'You can speed it up by moving it to a warmer area\n(70°-85° F).');
 
         const hotspot = this.addHotspot();
-        const player = this.addPlayer(data)
+        this.addPlayer(data)
         this.physics.add.overlap(
             player, hotspot, this.incrementTemp, null, this);
 
@@ -57,7 +57,7 @@ class Step2 extends BaseStep {
             player.anims.play('turn');
         }
 
-        this.moveTempTowards(68);
+        this.moveTempTowards(68, .003);
         this.updateFermetation();
         this.updateMaturity();
 
@@ -110,7 +110,7 @@ class Step2 extends BaseStep {
 
     createHud() {
         const hudTextStyle = {
-            fontSize: '26px',
+            fontSize: '22px',
             fill: TEXT_COLOR_STR,
             fontFamily: 'Gill Sans',
             align: 'right',
@@ -134,7 +134,7 @@ class Step2 extends BaseStep {
         const weightContainer = this.add.container(
             80, 0, [this._weightGauge, this._weightText]);
         const gauges = this.add.container(
-            680, 450, [tempContainer, abvContainer, weightContainer]);     
+            660, 450, [tempContainer, abvContainer, weightContainer]);     
 
         this._maturityMeter = new Phaser.GameObjects.Graphics(this);
         this._maturityMeter.maturity = 0;
@@ -173,21 +173,10 @@ class Step2 extends BaseStep {
     }
 
     addHotspot() {
-        const hotspot = this.physics.add.group({
-            key: 'hotspot',
-            repeat: 9,
-        });
-        hotspot.temperature = 140;
-        Phaser.Actions.GridAlign(hotspot.getChildren(), {
-            width: 3,
-            height: 3,
-            cellWidth: 50,
-            cellHeight: 50,
-            x: 150,
-            y: 350,
-        });
+        const hotspot = this.physics.add.staticSprite(150, 350, 'hotspot');
+        hotspot.setScale(3);
         let tween = this.tweens.add({
-            targets: hotspot.getChildren(),
+            targets: hotspot,
             duration: 3000,
             alpha: {start: .5, to: 1},
             repeat: -1,
@@ -197,14 +186,14 @@ class Step2 extends BaseStep {
     }
 
     incrementTemp(player, hotspot) {
-        this.moveTempTowards(140);
+        this.moveTempTowards(140, .03);
     }
 
-    moveTempTowards(target) {
+    moveTempTowards(target, amount) {
         if (player.properties.temperature <= target) {
-            player.properties.temperature += .003;
+            player.properties.temperature += amount;
         } else if (player.properties.temperature > target) {
-            player.properties.temperature -= .003;
+            player.properties.temperature -= amount;
         }
         const curTemp = Math.floor(player.properties.temperature);
         if (curTemp >= 71 && !this._fermentingTriggered) {
