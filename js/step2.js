@@ -34,6 +34,15 @@ class Step2 extends BaseStep {
         this.physics.add.overlap(
             player, hotspot, this.incrementTemp, null, this);
 
+        const maturity = this.add.text(400, 20, 'Maturity:', this._textStyle);
+        maturity.setFontSize(18);
+        maturity.setOrigin(1, 0);
+        maturity.setAlign('right');
+        this._maturityMeter = new Phaser.GameObjects.Graphics(this);
+        this._maturityMeter.maturity = 0;
+        this.updateMaturity();
+        this.add.existing(this._maturityMeter);
+
         // User input.
         cursors = this.input.keyboard.createCursorKeys();
     }
@@ -73,6 +82,7 @@ class Step2 extends BaseStep {
 
         this.moveTempTowards(68);
         this.updateFermetation();
+        this.updateMaturity();
     }
 
     addPlayer(data) {
@@ -116,6 +126,50 @@ class Step2 extends BaseStep {
         return player;
     }
 
+    updateMaturity() {
+        const x = 400;
+        const y = 20;
+        const width = 130;
+        const height = 12;
+
+        this._maturityMeter.clear();
+        //  Outline.
+        this._maturityMeter.fillStyle(0x27275b);
+        this._maturityMeter.fillRect(x, y, width + 4, height + 4);
+        // Background.
+        this._maturityMeter.fillStyle(0xa8a8c0);
+        this._maturityMeter.fillRect(x + 2, y + 2, width, height);
+
+        //  Maturity.
+        this._maturityMeter.fillStyle(0x585886);
+        if (this.isHealthy()) {
+            this._maturityMeter.maturity += .001;
+        }
+        if (this._maturityMeter.maturity >= 1) {
+            this.gameOver(true);
+        }
+        this._maturityMeter.maturity = Math.min(1, this._maturityMeter.maturity);
+        const widthFilled = this._maturityMeter.maturity * width;
+        this._maturityMeter.fillRect(x + 2, y + 2, widthFilled, height);
+    }
+
+    // TODO: move to player class
+    isHealthy() {
+        if (player.properties.temperature < 70 || 
+            player.properties.temperature > 85) {
+            return false;
+        }
+        const fermentation = (
+            player.properties.fermented / player.properties.weight);
+        if (fermentation < .2 || fermentation > .5) {
+            return false;
+        }
+        if (player.properties.weight < 1) {
+            return false;
+        }
+        return true;
+    }
+
     addHotspot() {
         const hotspot = this.physics.add.group({
             key: 'hotspot',
@@ -155,10 +209,10 @@ class Step2 extends BaseStep {
             this._instructions.setText('Yeast will start to die at 120°.');
         }
         if (curTemp <= 40) {
-            this.gameOver('got too cold');
+            this.gameOver(false, 'got too cold');
         }
         if (curTemp >= 140) {
-            this.gameOver('got too hot');
+            this.gameOver(false, 'got too hot');
         }
         this._thermometer.setText(`${curTemp}°`);
     }
@@ -231,14 +285,15 @@ class Step2 extends BaseStep {
         player.setScale(y, y);
 
         if (x < .1) {
-            this.gameOver('had unsustainably low fermentation');
+            this.gameOver(false, 'had unsustainably low fermentation');
         } else if (x > .9) {
-            this.gameOver('ran out of food');
+            this.gameOver(false, 'ran out of food');
         }
     }
 
-    gameOver(msg) {
-        player.properties['causeOfDeath'] = msg
+    gameOver(win, msg) {
+        player.properties['win'] = win;
+        player.properties['causeOfDeath'] = msg;
         const elapsedTime = Math.floor((this.time.now - this._startTime) / 1000);
         player.properties['elapsedTime'] = elapsedTime;
         this.scene.start('gameover', player.properties);
