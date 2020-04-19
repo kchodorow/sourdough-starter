@@ -1,18 +1,42 @@
 class Gauge extends Phaser.GameObjects.Graphics {
-    constructor(scene, minHealth, maxHealth) {
+    constructor(scene, minVal, maxVal, minHealth, maxHealth) {
         super(scene);
-        this._minHealth = minHealth;
-        this._maxHealth = maxHealth;
+        this._minVal = minVal;
+        this._maxVal = maxVal;
+        this._minHealth = this.getPercent(minHealth);
+        this._maxHealth = this.getPercent(maxHealth);
         this.setGauge(0);
     }
 
-    setGauge(percent) {
-        if (percent < 0) {
-            percent = 0;
-        } else if (percent > 1) {
-            percent = 1;
+    minValid() {
+        return this._minVal;
+    }
+
+    maxValid() {
+        return this._maxVal;
+    }
+
+    // min: 10
+    // max: 40
+    // val: 20
+    // percent: .33
+    //
+    // scaledmax = 30
+    // val-min -> 10/30 -> 1/3
+
+    getPercent(val) {
+        if (val < this._minVal) {
+            return 0;
+        } else if (val > this._maxVal) {
+            return 1;
         }
 
+        const scaledMax = this._maxVal - this._minVal;
+        return (val - this._minVal) / scaledMax;
+    }
+
+    setGauge(val) {
+        const percent = this.getPercent(val);
         const x = 0;
         const y = 0;
         const width = 16;

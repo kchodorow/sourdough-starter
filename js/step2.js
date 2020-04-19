@@ -80,11 +80,11 @@ class Step2 extends BaseStep {
             100 * (player.properties.fermented / player.properties.weight));
         const weight = Math.floor(player.properties.weight);
         this._thermometerText.setText(`${curTemp}°`);
-        this._thermometerGauge.setGauge(curTemp/140);
+        this._thermometerGauge.setGauge(curTemp);
         this._abvText.setText(`${abv}%`);
-        this._abvGauge.setGauge(abv/100);
+        this._abvGauge.setGauge(abv);
         this._weightText.setText(`${weight}oz`);
-        this._weightGauge.setGauge(weight/60);
+        this._weightGauge.setGauge(weight);
     }
 
     addPlayer(data) {
@@ -131,17 +131,19 @@ class Step2 extends BaseStep {
         };
         // Add thermometer.
         this._thermometerText = this.add.text(0, 120, '68', hudTextStyle);
-        this._thermometerGauge = new Gauge(this, .5, .7);
+        this._thermometerGauge = new Gauge(this, 50, 140, 70, 85);
         this.add.existing(this._thermometerGauge);
         const tempContainer = this.add.container(
             0, 0, [this._thermometerGauge, this._thermometerText]);
+        // Add ABV.
         this._abvText = this.add.text(0, 120, '25', hudTextStyle);
-        this._abvGauge = new Gauge(this, .3, .8);
+        this._abvGauge = new Gauge(this, 0, 100, 20, 60);
         this.add.existing(this._abvGauge);
         const abvContainer = this.add.container(
             40, 0, [this._abvGauge, this._abvText]);
+        // Add weight.
         this._weightText = this.add.text(0, 120, '20', hudTextStyle);
-        this._weightGauge = new Gauge(this, .2, .9);
+        this._weightGauge = new Gauge(this, 4, 100, 10, 60);
         this.add.existing(this._weightGauge);
         const weightContainer = this.add.container(
             80, 0, [this._weightGauge, this._weightText]);
@@ -236,10 +238,10 @@ class Step2 extends BaseStep {
         if (curTemp >= 112) {
             this._instructions.setText('Yeast will start to die at 120°.');
         }
-        if (curTemp <= 40) {
+        if (curTemp <= this._thermometerGauge.minValid()) {
             this.gameOver(false, 'got too cold');
         }
-        if (curTemp >= 140) {
+        if (curTemp >= this._thermometerGauge.maxValid()) {
             this.gameOver(false, 'got too hot');
         }
     }
@@ -286,6 +288,11 @@ class Step2 extends BaseStep {
             alpha: {start: 1, to: 0}, 
             duration: 750,
         });
+        if (player.properties.weight <= this._weightGauge.minValid()) {
+            this.gameOver(false, 'was too underweight');
+        } else if (player.properties.weight >= this._weightGauge.maxValid()) {
+            this.gameOver(false, 'was too large to sustain');
+        }
     }
 
     updateFermetation() {
@@ -304,9 +311,9 @@ class Step2 extends BaseStep {
         const scale = MAX_SCALE * (player.properties.weight / MAX_WEIGHT)
         player.setScale(scale, scale);
 
-        if (x < .1) {
+        if (x * 100 <= this._abvGauge.minValid()) {
             this.gameOver(false, 'had unsustainably low fermentation');
-        } else if (x > .9) {
+        } else if (x * 100 >= this._abvGauge.maxValid()) {
             this.gameOver(false, 'ran out of food');
         }
     }
