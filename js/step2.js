@@ -7,8 +7,9 @@ class Step2 extends BaseStep {
     constructor() {
         super({key: 'step2'});
         this._fermentingTriggered = false;
+        this._weightTriggered = false;
+        this._maturityTriggered = false;
         this._startTime = 0;
-        this._hasFedBefore = false;
     }
 
     preload() {
@@ -234,10 +235,10 @@ class Step2 extends BaseStep {
 
     addFlour() {
         player.properties.weight += 1;
-        if (!this._hasFedBefore) {
+        if (!this._weightTriggered) {
             this.addChopper();
         }
-        this._hasFedBefore = true;
+        this._weightTriggered = true;
     }
 
     addChopper() {
@@ -260,6 +261,11 @@ class Step2 extends BaseStep {
             alpha: {start: 1, to: 0}, 
             duration: 750,
         });
+
+        if (!this._maturityTriggered) {
+            this._instructions.setText(
+                'Keep all three gauges healthy for your starter to mature.');
+        }
         if (player.properties.weight <= this._weightGauge.minValid()) {
             this.gameOver(false, 'was too underweight');
         } else if (player.properties.weight >= this._weightGauge.maxValid()) {
