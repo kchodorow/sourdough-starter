@@ -1,6 +1,5 @@
 # TODO
 
-* Add guages for all three measures
 * Add interstitials with directions
 * Make hotspot clearer (tint?)
 
@@ -11,6 +10,7 @@ Intro:
 
 End game:
 
+* Drop bounding scallion pancakes
 * Add fresh bread icon
 
 ## Assets

@@ -3,6 +3,19 @@ const STARTER_OFFSET = 50;
 const TIP_ANGLE = 45;
 const TIP_SPEED = .8;
 
+
+const addTitle = function(scene, message) {
+    const titleStyle = {
+        fontSize: '40px', 
+        fill: TEXT_COLOR_STR, 
+        fontFamily: '"Dancing Script"',
+    };
+
+    const title = scene.add.text(400, 300, message, titleStyle);
+    title.setOrigin(.5, .5);
+    title.setAlign('center');
+}
+
 class Intro extends Phaser.Scene {
     constructor() {
         super({key: 'intro'});
@@ -10,15 +23,7 @@ class Intro extends Phaser.Scene {
 
     create() {
         this.cameras.main.setBackgroundColor(BACKGROUND_COLOR);
-        const titleStyle = {
-            fontSize: '40px', 
-            fill: TEXT_COLOR_STR, 
-            fontFamily: '"Dancing Script"',
-        };
-        const title = this.add.text(
-            400, 300, 'Sourdough Starter\nSimulator', titleStyle);
-        title.setOrigin(.5, .5);
-        title.setAlign('center');
+        addTitle(this, 'Sourdough Starter\nSimulator');
 
         this.input.once('pointerdown', function (event) {
             //this.scene.start('step1');

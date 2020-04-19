@@ -6,7 +6,7 @@ const SPEED = 5;
 class Step2 extends BaseStep {
     constructor() {
         super({key: 'step2'});
-        this._initialKeystroke = false;
+        this._fermentingTriggered = false;
         this._startTime = 0;
         this._hasFedBefore = false;
     }
@@ -24,6 +24,7 @@ class Step2 extends BaseStep {
     create(data) {
         this.cameras.main.setBackgroundColor(BACKGROUND_COLOR);
         this._startTime = this.time.now;
+
         this._instructions = this.addInstructions(
             'Step 2: put in a warm area (70°-85° F).');
 
@@ -42,31 +43,15 @@ class Step2 extends BaseStep {
         if (cursors.left.isDown) {
             player.setVelocityX(-60);
             player.anims.play('left', true);
-            if (!this._initialKeystroke) {
-                this.triggerFermentingText();
-                this._initialKeystroke = true;
-            }
         } else if (cursors.right.isDown) {
             player.setVelocityX(60);
             player.anims.play('right', true);
-            if (!this._initialKeystroke) {
-                this.triggerFermentingText();
-                this._initialKeystroke = true;
-            }
         } else if (cursors.up.isDown) {
             player.setVelocityY(-60);
             player.anims.play('right', true);
-            if (!this._initialKeystroke) {
-                this.triggerFermentingText();
-                this._initialKeystroke = true;
-            }
         } else if (cursors.down.isDown) {
             player.setVelocityY(60);
             player.anims.play('left', true);
-            if (!this._initialKeystroke) {
-                this.triggerFermentingText();
-                this._initialKeystroke = true;
-            }
         } else {
             player.anims.play('turn');
         }
@@ -130,19 +115,19 @@ class Step2 extends BaseStep {
             align: 'right',
         };
         // Add thermometer.
-        this._thermometerText = this.add.text(0, 120, '68', hudTextStyle);
+        this._thermometerText = this.add.text(0, 120, '', hudTextStyle);
         this._thermometerGauge = new Gauge(this, 50, 140, 70, 85);
         this.add.existing(this._thermometerGauge);
         const tempContainer = this.add.container(
             0, 0, [this._thermometerGauge, this._thermometerText]);
         // Add ABV.
-        this._abvText = this.add.text(0, 120, '25', hudTextStyle);
+        this._abvText = this.add.text(0, 120, '', hudTextStyle);
         this._abvGauge = new Gauge(this, 0, 100, 20, 60);
         this.add.existing(this._abvGauge);
         const abvContainer = this.add.container(
             40, 0, [this._abvGauge, this._abvText]);
         // Add weight.
-        this._weightText = this.add.text(0, 120, '20', hudTextStyle);
+        this._weightText = this.add.text(0, 120, '', hudTextStyle);
         this._weightGauge = new Gauge(this, 4, 100, 10, 60);
         this.add.existing(this._weightGauge);
         const weightContainer = this.add.container(
@@ -157,30 +142,16 @@ class Step2 extends BaseStep {
     }
 
     updateMaturity() {
-        const x = 250;
-        const y = 568;
-        const width = 300;
-        const height = 12;
-
-        this._maturityMeter.clear();
-        //  Outline.
-        this._maturityMeter.fillStyle(0x27275b);
-        this._maturityMeter.fillRect(x, y, width + 4, height + 4);
-        // Background.
-        this._maturityMeter.fillStyle(0xa8a8c0);
-        this._maturityMeter.fillRect(x + 2, y + 2, width, height);
-
-        //  Maturity.
-        this._maturityMeter.fillStyle(0x585886);
         if (this.isHealthy()) {
             this._maturityMeter.maturity += .001;
         }
         if (this._maturityMeter.maturity >= 1) {
             this.gameOver(true);
         }
-        this._maturityMeter.maturity = Math.min(1, this._maturityMeter.maturity);
-        const widthFilled = this._maturityMeter.maturity * width;
-        this._maturityMeter.fillRect(x + 2, y + 2, widthFilled, height);
+        this._maturityMeter.maturity = Math.min(
+            1, this._maturityMeter.maturity);
+        horizontalGaugeUpdate(
+            this._maturityMeter, this._maturityMeter.maturity);
     }
 
     // TODO: move to player class
@@ -235,6 +206,21 @@ class Step2 extends BaseStep {
             player.properties.temperature -= .003;
         }
         const curTemp = Math.floor(player.properties.temperature);
+        if (curTemp >= 71 && !this._fermentingTriggered) {
+            this._fermentingTriggered = true;
+            this.time.addEvent({
+                delay: 1500,  // ms
+                callback: function() {
+                    this._instructions.setText(
+                        'The percent of starter fermented can be lowered\n' +
+                        'by feeding it flour.');
+                    const flour = this.physics.add.staticSprite(600, 400, 'flour');
+                    this.physics.add.collider(
+                        player, flour, this.addFlour, null, this);
+                },
+                callbackScope: this,
+            });
+        }
         if (curTemp >= 112) {
             this._instructions.setText('Yeast will start to die at 120°.');
         }
@@ -244,20 +230,6 @@ class Step2 extends BaseStep {
         if (curTemp >= this._thermometerGauge.maxValid()) {
             this.gameOver(false, 'got too hot');
         }
-    }
-
-    triggerFermentingText() {
-        this.time.addEvent({
-            delay: 1500,  // ms
-            callback: function() {
-                this._instructions.setText(
-                    'Starter needs to be fed when it deflates.');
-                const flour = this.physics.add.staticSprite(600, 400, 'flour');
-                this.physics.add.collider(
-                    player, flour, this.addFlour, null, this);
-            },
-            callbackScope: this,
-        });
     }
 
     addFlour() {

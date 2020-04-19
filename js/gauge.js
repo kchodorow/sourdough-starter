@@ -72,3 +72,23 @@ class Gauge extends Phaser.GameObjects.Graphics {
         this.fillRect(x - 2, minHealthY + 2, width + 4, 1);
     }
 }
+
+var horizontalGaugeUpdate = function(meter, fracDone) {
+    const x = 250;
+    const y = 568;
+    const width = 300;
+    const height = 12;
+
+    meter.clear();
+    //  Outline.
+    meter.fillStyle(0x27275b);
+    meter.fillRect(x, y, width + 4, height + 4);
+    // Background.
+    meter.fillStyle(0xa8a8c0);
+    meter.fillRect(x + 2, y + 2, width, height);
+
+    //  Maturity.
+    meter.fillStyle(0x585886);
+    const widthFilled = fracDone * width;
+    meter.fillRect(x + 2, y + 2, widthFilled, height);
+}
