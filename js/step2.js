@@ -10,6 +10,8 @@ class Step2 extends BaseStep {
 
     preload() {
         this.load.image('hotspot', 'assets/bg.png');
+        this.load.image('flour', 'assets/flour.png');
+        this.load.image('water', 'assets/water.png');
         this.load.spritesheet(
             'starter',
             'assets/starter.png',
@@ -160,9 +162,23 @@ class Step2 extends BaseStep {
             callback: function() {
                 this._instructions.setText(
                     'Starter needs to be fed when it deflates.');
+                const flour = this.physics.add.staticSprite(600, 400, 'flour');
+                this.physics.add.collider(
+                    player, flour, this.addFlour, null, this);
+                const water = this.physics.add.staticSprite(600, 200, 'water');
+                this.physics.add.collider(
+                    player, water, this.addWater, null, this);
             },
             callbackScope: this,
         });
+    }
+
+    addFlour() {
+        player.properties.weight += .01;
+    }
+
+    addWater() {
+        player.properties.weight += .01;
     }
 
     updateFermetation() {
@@ -183,7 +199,7 @@ class Step2 extends BaseStep {
             y = 3;
         }
         this._debug.setText(
-            `${Math.floor(player.properties.fermented)}/${player.properties.weight}`);
+            `${Math.floor(player.properties.fermented)}/${Math.floor(player.properties.weight)}`);
         player.setScale(y, y);
         let gameOver = false;
         if (x < .1) {
