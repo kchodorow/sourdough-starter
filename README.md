@@ -3,11 +3,6 @@
 * Add interstitials with directions
 * Make hotspot clearer (tint?)
 
-Intro:
-
-* Add tweens
-* Add naming scene
-
 End game:
 
 * Drop bounding scallion pancakes

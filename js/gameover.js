@@ -9,7 +9,7 @@ class GameOver extends BaseStep {
         let statsStr = ''
         if (data.win) {
             title.setText(
-                'Congratulations!\nYou successfully matured your stater.');
+                'Congratulations!\nYou successfully matured your starter.');
             statsStr = (
                 `It took ${data.elapsedTime} seconds to reach maturity.\n` +
                 `Scallion pancakes: ${data.discard}`);

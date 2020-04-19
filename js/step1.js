@@ -1,5 +1,5 @@
 const BUFFER = 5;
-const STARTER_OFFSET = 50;
+const STARTER_OFFSET = 100;
 const TIP_ANGLE = 45;
 const TIP_SPEED = .8;
 
@@ -26,8 +26,8 @@ class Intro extends Phaser.Scene {
         addTitle(this, 'Sourdough Starter\nSimulator');
 
         this.input.once('pointerdown', function (event) {
-            //this.scene.start('step1');
-            this.scene.start('step2', {x: 450, y: 300});
+            this.scene.start('step1');
+//            this.scene.start('step2', {x: 450, y: 300});
         }, this);
     }
 }
@@ -41,6 +41,8 @@ class Step1 extends BaseStep {
         this._knocked_over = false;
         this._transitioning = false;
         this._starter = null;
+        this._waterAdded = false;
+        this._flourAdded = false;
     }
 
     preload() {
@@ -59,7 +61,8 @@ class Step1 extends BaseStep {
         this._cursors = this.input.keyboard.createCursorKeys();
 
         // Instructions.
-        this.addInstructions('Step 1: mix flour and water.');
+        const title = this.addInstructions(
+            'Step 1: mix flour and water.');
 
         // TODO: put these in a group and just get group members.
         this._flour = this.add.sprite(200, 300, 'flour');
@@ -69,14 +72,30 @@ class Step1 extends BaseStep {
 
         const originalThis = this;
         this._flour.on('pointerdown', function(pointer) {
-            originalThis._flour.destroy();
-            if (!originalThis._water.active) {
+            originalThis.tweens.add({
+                targets: [originalThis._flour],
+                x: {start: 200, to: 350},
+                y: {start: 300, to: 200},
+                rotation: 0.785398,
+                duration: 750,
+                yoyo: true,
+            });
+            originalThis._flourAdded = true;
+            if (originalThis.allIngredientsAdded()) {
                 originalThis.step2(title);
             }
         });
         this._water.on('pointerdown', function(pointer) {
-            originalThis._water.destroy();
-            if (!originalThis._flour.active) {
+            originalThis.tweens.add({
+                targets: [originalThis._water],
+                x: {start: 600, to: 450},
+                y: {start: 300, to: 200},
+                rotation: -0.785398,
+                duration: 750,
+                yoyo: true,
+            });
+            originalThis._waterAdded = true;
+            if (originalThis.allIngredientsAdded()) {
                 originalThis.step2(title);
             }
         });
@@ -128,7 +147,7 @@ class Step1 extends BaseStep {
 
     addStarter(dir) {
         this._starter = this.add.sprite(
-            400 + (STARTER_OFFSET * dir), 300, 'starter');
+            400 + (STARTER_OFFSET * dir), 310, 'starter');
     }
 
     transitionOut(progress) {
@@ -136,7 +155,7 @@ class Step1 extends BaseStep {
     }
 
     allIngredientsAdded() {
-        return !this._flour.active && !this._water.active;
+        return this._flourAdded && this._waterAdded;
     }
 
     step2(title) {
