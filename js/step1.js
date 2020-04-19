@@ -154,3 +154,14 @@ const tiltSuggestion = function() {
     hint.setOrigin(.5, 0);
     hint.setAlign('center');
 }
+
+class SetName extends BaseStep {
+    constructor() {
+        super({key: 'setname'});
+    }
+
+    create() {
+        this.addInstructions(
+            'Well that\'s more lively than usual. Let\'s give it a name.');
+    }
+}

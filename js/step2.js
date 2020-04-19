@@ -5,6 +5,7 @@ class Step2 extends BaseStep {
     constructor() {
         super({key: 'step2'});
         this._initialKeystroke = false;
+        this._startTime = 0;
     }
 
     preload() {
@@ -16,6 +17,7 @@ class Step2 extends BaseStep {
     }
 
     create(data) {
+        this._startTime = this.time.now;
         this._instructions = this.addInstructions(
             'Step 2: put in a warm area (70°-85° F).');
 
@@ -31,6 +33,11 @@ class Step2 extends BaseStep {
             fermented: 5.0,
             temperature: 68,
         };
+        // Add debug.
+        // TODO: remove.
+        this._debug = this.add.text(
+            10, 10, `${player.properties.fermented}/${player.properties.weight}`, this._textStyle);
+
 
         this.anims.create({
             key: 'left',
@@ -127,10 +134,10 @@ class Step2 extends BaseStep {
 
     moveTempTowards(target) {
         if (player.properties.temperature <= target) {
-            player.properties.temperature += .1;
+            player.properties.temperature += .05;
         }
         if (player.properties.temperature > target) {
-            player.properties.temperature -= .1;
+            player.properties.temperature -= .05;
         }
         const curTemp = Math.floor(player.properties.temperature);
         if (curTemp >= 112) {
@@ -167,9 +174,22 @@ class Step2 extends BaseStep {
         } else if (y > 3) {
             y = 3;
         }
+        this._debug.setText(
+            `${Math.floor(player.properties.fermented)}/${player.properties.weight}`);
         player.setScale(y, y);
-        if (x < .1 || x > .9) {
-            this.scene.start('gameover');
+        let gameOver = false;
+        if (x < .1) {
+            player.properties['causeOfDeath'] = 'unsustainably low fermentation';
+            gameOver = true;
+        } else if (x > .9) {
+            player.properties['causeOfDeath'] = 'its yeast running out of food';
+            gameOver = true;
+        }
+        if (gameOver) {
+            const elapsedTime = Math.floor((this.time.now - this._startTime) / 1000);
+            player.properties['elapsedTime'] = elapsedTime;
+            this.scene.start('gameover', player.properties);            
+
         }
     }
 }
