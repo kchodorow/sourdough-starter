@@ -168,5 +168,8 @@ class Step2 extends BaseStep {
             y = 3;
         }
         player.setScale(y, y);
+        if (x < .1 || x > .9) {
+            this.scene.start('gameover');
+        }
     }
 }
