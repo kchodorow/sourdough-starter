@@ -38,14 +38,13 @@ class Step1 extends BaseStep {
     }
 
     preload() {
-        this.load.setBaseURL('http://labs.phaser.io');
-
-        this.load.image('flour', 'assets/sprites/tomato.png');
-        this.load.image('water', 'assets/sprites/tinycar.png');
-        this.load.image('jar', 'assets/sprites/ufo.png');
-        this.load.spritesheet('dude', 
-            'assets/sprites/dude.png',
-            { frameWidth: 32, frameHeight: 48 });
+        this.load.image('flour', 'assets/flour.png');
+        this.load.image('water', 'assets/water.png');
+        this.load.image('jar', 'assets/jar.png');
+        this.load.spritesheet(
+            'starter',
+            'assets/starter.png',
+            {frameWidth: 50, frameHeight: 50});
     }
 
     create() {
@@ -122,7 +121,7 @@ class Step1 extends BaseStep {
 
     addStarter(dir) {
         this._starter = this.add.sprite(
-            400 + (STARTER_OFFSET * dir), 300, 'dude');
+            400 + (STARTER_OFFSET * dir), 300, 'starter');
     }
 
     transitionOut(progress) {

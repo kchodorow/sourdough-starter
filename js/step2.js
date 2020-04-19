@@ -160,11 +160,13 @@ class Step2 extends BaseStep {
         } else {
             player.properties.fermented -= .1;
         }
-        // Fermented = 
-        // 35%: 1x
-        // 60%: 3x
-        // 75%: 1x
-        // 100%: .5x
-        player.setScale()
+        const x = player.properties.fermented / player.properties.weight;
+        let y = -9.3 * x * x + 8.3 * x + 1.1;
+        if (y < .5) {
+            y = .5;
+        } else if (y > 3) {
+            y = 3;
+        }
+        player.setScale(y, y);
     }
 }
