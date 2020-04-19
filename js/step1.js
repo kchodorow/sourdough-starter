@@ -26,7 +26,8 @@ class Intro extends Phaser.Scene {
         addTitle(this, 'Sourdough Starter\nSimulator');
 
         this.input.once('pointerdown', function (event) {
-            this.scene.start('step1');
+            //this.scene.start('step1');
+            this.scene.start('gameover', {win:true, discard:10});
 //            this.scene.start('step2', {x: 450, y: 300});
         }, this);
     }

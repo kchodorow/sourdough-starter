@@ -3,9 +3,11 @@
 * Add interstitials with directions
 * Make hotspot clearer (tint?)
 
+* Add random cold area
+* Add gauges one at a time
+
 End game:
 
-* Drop bounding scallion pancakes
 * Add fresh bread icon
 
 ## Assets
