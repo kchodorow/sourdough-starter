@@ -3,6 +3,7 @@ class Gauge extends Phaser.GameObjects.Graphics {
         super(scene);
         this._minHealth = minHealth;
         this._maxHealth = maxHealth;
+        this.setGauge(0);
     }
 
     setGauge(percent) {

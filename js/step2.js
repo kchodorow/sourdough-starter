@@ -79,9 +79,12 @@ class Step2 extends BaseStep {
         const abv = Math.floor(
             100 * (player.properties.fermented / player.properties.weight));
         const weight = Math.floor(player.properties.weight);
-        this._thermometer.setText(
-            `Temperature: ${curTemp}°\nFermentation: ${abv}%\nWeight: ${weight}oz`);
+        this._thermometerText.setText(`${curTemp}°`);
         this._thermometerGauge.setGauge(curTemp/140);
+        this._abvText.setText(`${abv}%`);
+        this._abvGauge.setGauge(abv/100);
+        this._weightText.setText(`${weight}oz`);
+        this._weightGauge.setGauge(weight/60);
     }
 
     addPlayer(data) {
@@ -127,15 +130,23 @@ class Step2 extends BaseStep {
             align: 'right',
         };
         // Add thermometer.
-        this._thermometer = this.add.text(0, 120, '', hudTextStyle).setOrigin(1, 1);
-
         this._thermometerText = this.add.text(0, 120, '68', hudTextStyle);
         this._thermometerGauge = new Gauge(this, .5, .7);
         this.add.existing(this._thermometerGauge);
-        this._thermometerGauge.x = 0;
-        this._thermometerGauge.y = 0;
-        const thermometer = this.add.container(
-            760, 380, [this._thermometerGauge, this._thermometerText]);
+        const tempContainer = this.add.container(
+            0, 0, [this._thermometerGauge, this._thermometerText]);
+        this._abvText = this.add.text(0, 120, '25', hudTextStyle);
+        this._abvGauge = new Gauge(this, .3, .8);
+        this.add.existing(this._abvGauge);
+        const abvContainer = this.add.container(
+            40, 0, [this._abvGauge, this._abvText]);
+        this._weightText = this.add.text(0, 120, '20', hudTextStyle);
+        this._weightGauge = new Gauge(this, .2, .9);
+        this.add.existing(this._weightGauge);
+        const weightContainer = this.add.container(
+            80, 0, [this._weightGauge, this._weightText]);
+        const gauges = this.add.container(
+            680, 450, [tempContainer, abvContainer, weightContainer]);     
 
         this._maturityMeter = new Phaser.GameObjects.Graphics(this);
         this._maturityMeter.maturity = 0;
