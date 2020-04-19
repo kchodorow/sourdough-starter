@@ -78,26 +78,9 @@ class Step2 extends BaseStep {
         const curTemp = Math.floor(player.properties.temperature);
         const abv = Math.floor(
             100 * (player.properties.fermented / player.properties.weight));
-        const weight = player.properties.weight;
-        this._thermometer.setText(`${curTemp}°\n${abv}% ABV\n${weight}oz`);
-    }
-
-    createHud() {
-        const maturity = this.add.text(20, 20, 'Maturity:', this._textStyle);
-        maturity.setOrigin(1, 0).setAlign('right').setFontSize(18);
-        this._maturityMeter = new Phaser.GameObjects.Graphics(this);
-        this._maturityMeter.maturity = 0;
-        this.updateMaturity();
-        this.add.existing(this._maturityMeter);
-
-        // Add thermometer.
-        this._thermometer = this.add.text(20, 20, ``, this._textStyle);
-        this._thermometer.setOrigin(1, 1).setAlign('right').setFontSize(22);
-
-        const hud = this.physics.add.staticGroup(
-            [this._thermometer, maturity, this._maturityMeter]);
-        hud.setX(580);
-        hud.setY(560);
+        const weight = Math.floor(player.properties.weight);
+        this._thermometer.setText(
+            `Temperature: ${curTemp}°\nFermentation: ${abv}%\nWeight: ${weight}oz`);
     }
 
     addPlayer(data) {
@@ -110,12 +93,6 @@ class Step2 extends BaseStep {
             temperature: 68,
             discard: 0,
         };
-        // Add debug.
-        // TODO: remove.
-        this._debug = this.add.text(
-            10, 10, 
-            `${player.properties.fermented}/${player.properties.weight}`, 
-            this._textStyle);
 
         this.anims.create({
             key: 'left',
@@ -141,10 +118,26 @@ class Step2 extends BaseStep {
         return player;
     }
 
+    createHud() {
+        const hudTextStyle = {
+            fontSize: '26px',
+            fill: TEXT_COLOR_STR,
+            fontFamily: 'Gill Sans',
+            align: 'right',
+        };
+        // Add thermometer.
+        this._thermometer = this.add.text(790, 590, '', hudTextStyle).setOrigin(1, 1);
+
+        this._maturityMeter = new Phaser.GameObjects.Graphics(this);
+        this._maturityMeter.maturity = 0;
+        this.updateMaturity();
+        this.add.existing(this._maturityMeter);
+    }
+
     updateMaturity() {
-        const x = 0;
-        const y = 0;
-        const width = 130;
+        const x = 250;
+        const y = 568;
+        const width = 300;
         const height = 12;
 
         this._maturityMeter.clear();
