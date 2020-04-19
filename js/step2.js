@@ -4,51 +4,52 @@ const SPEED = 5;
 class Step2 extends BaseStep {
     constructor() {
         super({key: 'step2'});
+        this._initialKeystroke = false;
     }
 
     preload() {
-        this.load.setBaseURL('http://labs.phaser.io');
-
-        this.load.image('hotspot', 'assets/sprites/tomato.png');
-        this.load.spritesheet('dude', 
-            'assets/sprites/dude.png',
-            { frameWidth: 32, frameHeight: 48 });
+        this.load.image('hotspot', 'assets/bg.png');
+        this.load.spritesheet(
+            'starter',
+            'assets/starter.png',
+            {frameWidth: 50, frameHeight: 50});
     }
 
     create(data) {
-        this.addInstructions('Step 2: put in a warm area (70°-85° F).');
+        this._instructions = this.addInstructions(
+            'Step 2: put in a warm area (70°-85° F).');
 
         // Add thermometer.
         this._thermometer = this.add.text(780, 580, '68°', this._textStyle);
         this._thermometer.setOrigin(1, 1).setAlign('right').setFontSize(22);
 
-        player = this.physics.add.sprite(data.x, data.y, 'dude');
+        player = this.physics.add.sprite(data.x, data.y, 'starter');
         player.setBounce(0.2);
         player.setCollideWorldBounds(true);
         player.properties = {
             weight: 20.0,
             fermented: 5.0,
             temperature: 68,
-            velocityX: 0,
-            velocityY: 0,
         };
 
         this.anims.create({
             key: 'left',
-            frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+            frames: this.anims.generateFrameNumbers(
+                'starter', {start: 4, end: 6}),
             frameRate: 10,
             repeat: -1
         });
 
         this.anims.create({
             key: 'turn',
-            frames: [ { key: 'dude', frame: 4 } ],
+            frames: [{key: 'starter', frame: 0}],
             frameRate: 20
         });
 
         this.anims.create({
             key: 'right',
-            frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+            frames: this.anims.generateFrameNumbers(
+                'starter', {start: 1, end: 3}),
             frameRate: 10,
             repeat: -1
         });
@@ -83,6 +84,43 @@ class Step2 extends BaseStep {
             player, hotspot, this.incrementTemp, null, this);
     }
 
+    update() {
+        if (cursors.left.isDown) {
+            player.setVelocityX(-60);
+            player.anims.play('left', true);
+            if (!this._initialKeystroke) {
+                this.triggerFermentingText();
+                this._initialKeystroke = true;
+            }
+        } else if (cursors.right.isDown) {
+            player.setVelocityX(60);
+            player.anims.play('right', true);
+            if (!this._initialKeystroke) {
+                this.triggerFermentingText();
+                this._initialKeystroke = true;
+            }
+        } else if (cursors.up.isDown) {
+            player.setVelocityY(-60);
+            player.anims.play('right', true);
+            if (!this._initialKeystroke) {
+                this.triggerFermentingText();
+                this._initialKeystroke = true;
+            }
+        } else if (cursors.down.isDown) {
+            player.setVelocityY(60);
+            player.anims.play('left', true);
+            if (!this._initialKeystroke) {
+                this.triggerFermentingText();
+                this._initialKeystroke = true;
+            }
+        } else {
+            player.anims.play('turn');
+        }
+
+        this.moveTempTowards(68);
+        this.updateFermetation();
+    }
+
     incrementTemp(player, hotspot) {
         this.moveTempTowards(140);
     }
@@ -94,27 +132,39 @@ class Step2 extends BaseStep {
         if (player.properties.temperature > target) {
             player.properties.temperature -= .1;
         }
-        this._thermometer.setText(
-            `${Math.floor(player.properties.temperature)}°`);
+        const curTemp = Math.floor(player.properties.temperature);
+        if (curTemp >= 112) {
+            this._instructions.setText('Yeast will start to die at 120°.');
+        }
+        this._thermometer.setText(`${curTemp}°`);
     }
 
-    update() {
-        if (cursors.left.isDown) {
-            player.setVelocityX(-60);
-            player.anims.play('left', true);
-        } else if (cursors.right.isDown) {
-            player.setVelocityX(60);
-            player.anims.play('right', true);
-        } else if (cursors.up.isDown) {
-            player.setVelocityY(-60);
-            player.anims.play('right', true);
-        } else if (cursors.down.isDown) {
-            player.setVelocityY(60);
-            player.anims.play('left', true);
-        } else {
-            player.anims.play('turn');
-        }
+    triggerFermentingText() {
+        this.time.addEvent({
+            delay: 1500,  // ms
+            callback: function() {
+                this._instructions.setText(
+                    'Starter needs to be fed when it deflates.');
+            },
+            callbackScope: this,
+        });
+    }
 
-        this.moveTempTowards(68);
+    updateFermetation() {
+        if (player.properties.temperature >= 70 &&
+            player.properties.temperature <= 85) {
+            player.properties.fermented += .1;
+        } else if (player.properties.temperature >= 50 &&
+            player.properties.temperature <= 120) {
+            player.properties.fermented += .01;
+        } else {
+            player.properties.fermented -= .1;
+        }
+        // Fermented = 
+        // 35%: 1x
+        // 60%: 3x
+        // 75%: 1x
+        // 100%: .5x
+        player.setScale()
     }
 }
