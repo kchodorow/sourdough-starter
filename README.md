@@ -1,8 +1,8 @@
 # TODO
 
-* Add food/water
 * Trimming/baking
 * Make thermometer blue/red when it's cold/hot
+* Add maturity meter
 
 Intro:
 

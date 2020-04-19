@@ -14,7 +14,7 @@ class GameOver extends BaseStep {
         title.setAlign('center');
         const statsStr = `Stats:\n` +
             `Elapsed time: ${data.elapsedTime} seconds\n` +
-            `Baked discards: 0`;
+            `Scallion pancakes: ${data.discard}`;
         const stats = this.add.text(
             400, 250, statsStr, this._textStyle);
         stats.setFontSize(20);

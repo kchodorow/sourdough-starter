@@ -6,12 +6,13 @@ class Step2 extends BaseStep {
         super({key: 'step2'});
         this._initialKeystroke = false;
         this._startTime = 0;
+        this._hasFedBefore = false;
     }
 
     preload() {
         this.load.image('hotspot', 'assets/bg.png');
         this.load.image('flour', 'assets/flour.png');
-        this.load.image('water', 'assets/water.png');
+        this.load.image('chopper', 'assets/water.png');
         this.load.spritesheet(
             'starter',
             'assets/starter.png',
@@ -82,6 +83,7 @@ class Step2 extends BaseStep {
             weight: 20.0,
             fermented: 5.0,
             temperature: 68,
+            discard: 0,
         };
         // Add debug.
         // TODO: remove.
@@ -170,9 +172,6 @@ class Step2 extends BaseStep {
                 const flour = this.physics.add.staticSprite(600, 400, 'flour');
                 this.physics.add.collider(
                     player, flour, this.addFlour, null, this);
-                const water = this.physics.add.staticSprite(600, 200, 'water');
-                this.physics.add.collider(
-                    player, water, this.addWater, null, this);
             },
             callbackScope: this,
         });
@@ -180,10 +179,32 @@ class Step2 extends BaseStep {
 
     addFlour() {
         player.properties.weight += .01;
+        if (!this._hasFedBefore) {
+            this.addChopper();
+        }
+        this._hasFedBefore = true;
     }
 
-    addWater() {
-        player.properties.weight += .01;
+    addChopper() {
+        this._instructions.setText(
+            'Discard 20% of your starter when it gets too big.');
+        const chopper = this.physics.add.staticSprite(400, 200, 'chopper');
+        this.physics.add.collider(
+            player, chopper, this.discard, null, this);
+    }
+
+    discard(player, chopper) {
+        player.properties.weight *= .8;
+        player.properties.fermented *= .8;
+        player.properties.discard += 1;
+        const discardMessage = this.add.text(
+            chopper.x, chopper.y, '+1 scallion pancake', this._textStyle);
+        this.tweens.add({
+            targets: [discardMessage],
+            y: {start: chopper.y, to: chopper.y-50},
+            alpha: {start: 1, to: 0}, 
+            duration: 750,
+        });
     }
 
     updateFermetation() {
