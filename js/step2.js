@@ -1,4 +1,6 @@
 const EPSILON = .2;
+const MAX_SCALE = 3;
+const MAX_WEIGHT = 60;
 const SPEED = 5;
 
 class Step2 extends BaseStep {
@@ -25,23 +27,12 @@ class Step2 extends BaseStep {
         this._instructions = this.addInstructions(
             'Step 2: put in a warm area (70°-85° F).');
 
-        // Add thermometer.
-        this._thermometer = this.add.text(780, 580, '68°', this._textStyle);
-        this._thermometer.setOrigin(1, 1).setAlign('right').setFontSize(22);
-
         const hotspot = this.addHotspot();
         const player = this.addPlayer(data)
         this.physics.add.overlap(
             player, hotspot, this.incrementTemp, null, this);
 
-        const maturity = this.add.text(400, 20, 'Maturity:', this._textStyle);
-        maturity.setFontSize(18);
-        maturity.setOrigin(1, 0);
-        maturity.setAlign('right');
-        this._maturityMeter = new Phaser.GameObjects.Graphics(this);
-        this._maturityMeter.maturity = 0;
-        this.updateMaturity();
-        this.add.existing(this._maturityMeter);
+        this.createHud();
 
         // User input.
         cursors = this.input.keyboard.createCursorKeys();
@@ -83,6 +74,30 @@ class Step2 extends BaseStep {
         this.moveTempTowards(68);
         this.updateFermetation();
         this.updateMaturity();
+
+        const curTemp = Math.floor(player.properties.temperature);
+        const abv = Math.floor(
+            100 * (player.properties.fermented / player.properties.weight));
+        const weight = player.properties.weight;
+        this._thermometer.setText(`${curTemp}°\n${abv}% ABV\n${weight}oz`);
+    }
+
+    createHud() {
+        const maturity = this.add.text(20, 20, 'Maturity:', this._textStyle);
+        maturity.setOrigin(1, 0).setAlign('right').setFontSize(18);
+        this._maturityMeter = new Phaser.GameObjects.Graphics(this);
+        this._maturityMeter.maturity = 0;
+        this.updateMaturity();
+        this.add.existing(this._maturityMeter);
+
+        // Add thermometer.
+        this._thermometer = this.add.text(20, 20, ``, this._textStyle);
+        this._thermometer.setOrigin(1, 1).setAlign('right').setFontSize(22);
+
+        const hud = this.physics.add.staticGroup(
+            [this._thermometer, maturity, this._maturityMeter]);
+        hud.setX(580);
+        hud.setY(560);
     }
 
     addPlayer(data) {
@@ -127,8 +142,8 @@ class Step2 extends BaseStep {
     }
 
     updateMaturity() {
-        const x = 400;
-        const y = 20;
+        const x = 0;
+        const y = 0;
         const width = 130;
         const height = 12;
 
@@ -214,7 +229,6 @@ class Step2 extends BaseStep {
         if (curTemp >= 140) {
             this.gameOver(false, 'got too hot');
         }
-        this._thermometer.setText(`${curTemp}°`);
     }
 
     triggerFermentingText() {
@@ -232,7 +246,7 @@ class Step2 extends BaseStep {
     }
 
     addFlour() {
-        player.properties.weight += .01;
+        player.properties.weight += 1;
         if (!this._hasFedBefore) {
             this.addChopper();
         }
@@ -274,15 +288,8 @@ class Step2 extends BaseStep {
         }
 
         const x = player.properties.fermented / player.properties.weight;
-        let y = -9.3 * x * x + 8.3 * x + 1.1;
-        if (y < .5) {
-            y = .5;
-        } else if (y > 3) {
-            y = 3;
-        }
-        this._debug.setText(
-            `${Math.floor(player.properties.fermented)}/${Math.floor(player.properties.weight)}`);
-        player.setScale(y, y);
+        const scale = MAX_SCALE * (player.properties.weight / MAX_WEIGHT)
+        player.setScale(scale, scale);
 
         if (x < .1) {
             this.gameOver(false, 'had unsustainably low fermentation');
