@@ -26,8 +26,7 @@ class Intro extends Phaser.Scene {
         addTitle(this, 'Sourdough Starter\nSimulator');
 
         this.input.once('pointerdown', function (event) {
-            //this.scene.start('step1');
-            this.scene.start('step2',  {x: 450, y: 300});
+            this.scene.start('step1');
         }, this);
     }
 }
@@ -63,11 +62,14 @@ class Step1 extends BaseStep {
         // Instructions.
         const title = this.addInstructions(
             'Step 1: mix flour and water.');
+        this._title = title;
 
         // TODO: put these in a group and just get group members.
         this._flour = this.add.sprite(200, 300, 'flour');
+        this._flour.setScale(2);
         this._flour.setInteractive();
         this._water = this.add.sprite(600, 300, 'water');
+        this._water.setScale(2);
         this._water.setInteractive();
 
         const originalThis = this;
@@ -154,6 +156,8 @@ class Step1 extends BaseStep {
         this._jar.setAlpha(1 - progress);
         this._flour.setAlpha(1 - progress);
         this._water.setAlpha(1 - progress);
+        this._title.setAlpha(1 - progress);
+        this._hint.setAlpha(1 - progress);
     }
 
     allIngredientsAdded() {
@@ -181,6 +185,7 @@ const tiltSuggestion = function() {
         400, 550, '(Use left and right to tilt the jar)', hintStyle);
     hint.setOrigin(.5, 0);
     hint.setAlign('center');
+    this._hint = hint;
 }
 
 class SetName extends BaseStep {

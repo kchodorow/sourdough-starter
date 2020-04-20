@@ -45,9 +45,10 @@ class GameOver extends BaseStep {
             key: 'pancakes',
             repeat: numPancakes - 1,
             setXY: { x: 50, y: 0, stepX: 800/numPancakes },
-            frames: [0, 1, 2],
         });
         pancakes.children.iterate(function (child) {
+            child.setScale(2);
+            child.setFrame(Math.floor(Math.random() * 3));
             child.setCollideWorldBounds(true)
             child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
             child.setBounceX(Phaser.Math.FloatBetween(0.5, 0.9));

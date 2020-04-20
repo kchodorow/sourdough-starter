@@ -202,9 +202,9 @@ class Step2 extends BaseStep {
                 delay: 1500,  // ms
                 callback: function() {
                     this._instructions.setText(
-                        'The percent of starter fermented can be lowered\n' +
-                        'by feeding it flour.');
+                        'Fermentation % can be lowered by feeding it flour.');
                     const flour = this.physics.add.staticSprite(600, 400, 'flour');
+                    flour.setScale(2);
                     this.physics.add.collider(
                         player, flour, this.addFlour, null, this);
                 },
