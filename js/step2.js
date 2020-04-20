@@ -57,7 +57,7 @@ class Step2 extends BaseStep {
             player.anims.play('turn');
         }
 
-        this.moveTempTowards(68, .003);
+        this.moveTempTowards(68, .007);
         this.updateFermetation();
         this.updateMaturity();
 
@@ -140,11 +140,12 @@ class Step2 extends BaseStep {
         this._maturityMeter.maturity = 0;
         this.updateMaturity();
         this.add.existing(this._maturityMeter);
+        this.add.text(544, 567, '🏆').setFontSize('22px');
     }
 
     updateMaturity() {
         if (this.isHealthy()) {
-            this._maturityMeter.maturity += .001;
+            this._maturityMeter.maturity += .0004;
         }
         if (this._maturityMeter.maturity >= 1) {
             this.gameOver(true);
@@ -265,13 +266,13 @@ class Step2 extends BaseStep {
     updateFermetation() {
         if (player.properties.temperature >= 70 &&
             player.properties.temperature <= 85) {
-            player.properties.fermented += .01;
+            player.properties.fermented += .015;
         } else if (player.properties.temperature >= 50 &&
             player.properties.temperature <= 120) {
-            player.properties.fermented += .001;
+            player.properties.fermented += .005;
         } else {
             // At other temperatures yeast starts to die.
-            player.properties.fermented -= .001;
+            player.properties.fermented -= .02;
         }
 
         const x = player.properties.fermented / player.properties.weight;

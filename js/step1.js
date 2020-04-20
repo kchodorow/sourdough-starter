@@ -27,6 +27,7 @@ class Intro extends Phaser.Scene {
 
         this.input.once('pointerdown', function (event) {
             this.scene.start('step1');
+            //this.scene.start('step2', {x:450, y:300});
         }, this);
     }
 }
