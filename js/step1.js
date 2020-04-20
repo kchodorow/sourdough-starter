@@ -158,7 +158,9 @@ class Step1 extends BaseStep {
         this._flour.setAlpha(1 - progress);
         this._water.setAlpha(1 - progress);
         this._title.setAlpha(1 - progress);
-        this._hint.setAlpha(1 - progress);
+        if (this._hint) {
+            this._hint.setAlpha(1 - progress);
+        }
     }
 
     allIngredientsAdded() {

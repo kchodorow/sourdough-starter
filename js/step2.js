@@ -27,7 +27,7 @@ class Step2 extends BaseStep {
         this._startTime = this.time.now;
 
         this._instructions = this.addInstructions(
-            'You can speed it up by moving it to a warmer area\n(70°-85° F).');
+            'You can speed it up by moving it to a warmer area\n(70\u00b0-85\u00b0 F).');
 
         const hotspot = this.addHotspot();
         this.addPlayer(data)
@@ -65,7 +65,7 @@ class Step2 extends BaseStep {
         const abv = Math.floor(
             100 * (player.properties.fermented / player.properties.weight));
         const weight = Math.floor(player.properties.weight);
-        this._thermometerText.setText(`${curTemp}°`);
+        this._thermometerText.setText(`${curTemp}\u00b0`);
         this._thermometerGauge.setGauge(curTemp);
         this._abvText.setText(`${abv}%`);
         this._abvGauge.setGauge(abv);
@@ -140,7 +140,7 @@ class Step2 extends BaseStep {
         this._maturityMeter.maturity = 0;
         this.updateMaturity();
         this.add.existing(this._maturityMeter);
-        this.add.text(544, 567, '🏆').setFontSize('22px');
+        this.add.text(400, 560, 'Maturity', hudTextStyle).setOrigin(.5, 1);
     }
 
     updateMaturity() {
@@ -213,7 +213,7 @@ class Step2 extends BaseStep {
             });
         }
         if (curTemp >= 112) {
-            this._instructions.setText('Yeast will start to die at 120°.');
+            this._instructions.setText('Yeast will start to die at 120&#176;.');
         }
         if (curTemp <= this._thermometerGauge.minValid()) {
             this.gameOver(false, 'got too cold');
